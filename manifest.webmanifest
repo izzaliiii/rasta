@@ -1,0 +1,21 @@
+{
+  "name": "Rasta — Islamabad & Rawalpindi bus routes",
+  "short_name": "Rasta",
+  "description": "Routes, stops, timings and fares for the Islamabad and Rawalpindi Metro Bus, Green Line, Blue Line and Orange Line. Works offline.",
+  "start_url": "./index.html#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f5",
+  "theme_color": "#0a7d4f",
+  "lang": "en",
+  "categories": ["travel", "navigation", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230a7d4f'/%3E%3Cpath d='M144 368V208a64 64 0 0 1 64-64h96a64 64 0 0 1 64 64v160' stroke='white' stroke-width='40' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='200' cy='304' r='29' fill='white'/%3E%3Ccircle cx='312' cy='304' r='29' fill='white'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

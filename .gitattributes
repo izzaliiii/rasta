@@ -1,0 +1,13 @@
+# Normalise line endings so the repo behaves the same on Windows, macOS and Linux.
+# The app is plain text with no build step, so getting this right matters more
+# than usual: a CRLF-saved app.js still works, but diffs become unreadable.
+* text=auto eol=lf
+
+# Windows-only helpers keep their native endings.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.ico binary
