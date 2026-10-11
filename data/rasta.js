@@ -302,6 +302,66 @@ var Rasta = (function () {
     return (stationIndex[id] || []).map(function (p) { return p.line; });
   }
 
+  /* ---------------------------------------------------------- data freshness
+   *
+   * This app ships a FROZEN snapshot. Nothing here updates itself: there is no
+   * feed to poll and no API to call. That is a deliberate consequence of no
+   * machine-readable data existing for these services — but it means the app
+   * will keep answering confidently long after the answer stops being true.
+   *
+   * A stale transit app fails silently and dangerously: it will show a last-bus
+   * time that no longer runs and give no hint that anything is wrong. So the
+   * age of the data is computed and surfaced rather than left implicit.
+   */
+
+  /** Data older than this is no longer safe to treat as current. */
+  var STALE_AFTER_DAYS = 120;
+
+  /** Whole days between the dataset's date and `now`. Negative if future-dated. */
+  function dataAgeDays(now) {
+    var asOf = META.dataAsOf;
+    if (!asOf) return null;
+    var then = Date.parse(asOf + 'T00:00:00');
+    if (isNaN(then)) return null;
+    var ref = now ? now.getTime() : Date.now();
+    return Math.floor((ref - then) / 86400000);
+  }
+
+  /**
+   * Freshness verdict for the UI.
+   * `level` is one of: fresh | ageing | stale | unknown.
+   */
+  function freshness(now) {
+    var days = dataAgeDays(now);
+    if (days === null) return { level: 'unknown', days: null, message: 'Data date unknown.' };
+
+    if (days < 0) {
+      return {
+        level: 'fresh', days: days,
+        message: 'Dataset is dated in the future (' + META.dataAsOf + '). Check the system clock.'
+      };
+    }
+    if (days <= 45) {
+      return {
+        level: 'fresh', days: days,
+        message: 'Data is current as of ' + META.dataAsOf + ' (' + days + ' days old).'
+      };
+    }
+    if (days <= STALE_AFTER_DAYS) {
+      return {
+        level: 'ageing', days: days,
+        message: 'Data was last checked on ' + META.dataAsOf + ', ' + days +
+                 ' days ago. Routes and fares may have changed since.'
+      };
+    }
+    return {
+      level: 'stale', days: days,
+      message: 'This data is ' + days + ' days old and is likely out of date. Treat ' +
+               'routes, fares and especially last-bus times as unreliable until it is ' +
+               'refreshed.'
+    };
+  }
+
   /* --------------------------------------------------------------- alerts */
 
   /* Severity rank. Must be looked up defensively: `rank[x] || 9` would map a
@@ -382,6 +442,9 @@ var Rasta = (function () {
     alertsForLine: alertsForLine,
     alertsForJourney: alertsForJourney,
     activeAlerts: activeAlerts,
+    dataAgeDays: dataAgeDays,
+    freshness: freshness,
+    staleAfterDays: STALE_AFTER_DAYS,
     directionFor: directionFor,
     normalise: normalise
   };

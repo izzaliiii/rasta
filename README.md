@@ -37,12 +37,12 @@ routes, stops and journey planning work with no internet in both cases.
 
 | Screen | What it gives you |
 |---|---|
-| **Home** | Service alerts first, then stop search and the line list |
+| **Home** | Data-age warning when stale, service alerts, then stop search and the line list |
 | **Lines** | All four lines with length, span, frequency and fare |
 | **Line detail** | Every stop in order, with interchanges marked and a reverse-direction toggle |
 | **Plan** | Pick two stops; get the lines to take, where to change, estimated time and fare |
 | **Stops** | Every stop by city, with search that also matches landmarks and areas |
-| **Info** | Data confidence, known gaps, sources and the disclaimer |
+| **Info** | How current the data is, data confidence, known gaps, sources and the disclaimer |
 
 Journey planning is a shortest-path search across the stop graph. It scores a
 route by travel time plus an 8-minute penalty every time you change lines, so it
@@ -56,6 +56,28 @@ shareable and the back button works.
 ---
 
 ## Read this before trusting it
+
+**The data is a frozen snapshot. It does not update itself.**
+
+There is nothing to poll and no API to call, because no machine-readable feed
+exists for these services. Routes, fares and timings change only when someone
+edits `data/transit-data.js` and commits it. That is a real limitation, and the
+app is built to be loud about it rather than quietly wrong: once the dataset
+passes **120 days** old, the home screen shows an "out of date" warning above
+everything else, and the Info screen always states the data's age.
+
+A stale transit app fails silently — it keeps showing a last-bus time that no
+longer runs. That is worse than showing nothing, so the age of the data is
+computed and surfaced at all times.
+
+You can see the warning without waiting 120 days:
+
+```sh
+node serve.js
+# then open http://localhost:8080/index.html?now=2027-12-20#/
+```
+
+The `?now=` parameter shifts the clock for demonstration only.
 
 **Rasta is not a live bus tracker, and it cannot be one yet.**
 
@@ -136,9 +158,9 @@ rasta/
 │   └── shots/                 the captured screens
 └── tests/
     ├── all.js                 run everything
-    ├── run-tests.js           data integrity + planner correctness (38 checks)
+    ├── run-tests.js           data integrity, planner, freshness (46 checks)
     ├── calibrate.js           are the coordinates geographically sane?
-    └── render-test.js         every view renders + controls work (39 checks)
+    └── render-test.js         every view renders + controls work (44 checks)
 ```
 
 ---
@@ -167,22 +189,25 @@ node tests/all.js
 
 Three suites, all dependency-free:
 
-**`run-tests.js`** — 38 checks over the dataset and planner. Structural integrity
+**`run-tests.js`** — 46 checks over the dataset and planner. Structural integrity
 (no duplicate ids, no orphan stations, no two stops sharing a coordinate),
 network connectivity (every stop reachable from every other), planner correctness
 (legs are contiguous runs on real lines, adjacent legs never repeat a line,
 transfers are actually charged), edge cases (same origin, unknown stop, nonsense
-input), and the alert channel.
+input), the alert channel, and data freshness (the age calculation must escalate
+from fresh to ageing to stale at the right thresholds, because a snapshot that
+never admits its age is dangerous).
 
 **`calibrate.js`** — measures each line the way the app does and compares it to
 the operator's published corridor length. The Red Line is published at ~22.5 km
 and measures ~23.6 km. It also flags any single hop over 12 km and any implied
 speed outside a believable 8–45 km/h band.
 
-**`render-test.js`** — loads the real `app.js` against a minimal DOM and renders
-every route, then drives the controls: types two stops and submits, swaps
-endpoints, filters the stop list, toggles the theme. This is what catches a
-broken template or a view that throws on a real element.
+**`render-test.js`** — 44 checks. Loads the real `app.js` against a minimal DOM
+and renders every route, then drives the controls: types two stops and submits,
+swaps endpoints, filters the stop list, toggles the theme. It also fakes the
+system clock to prove the staleness warning actually reaches the screen at 60
+and 400 days, rather than only computing the right answer internally.
 
 These have already earned their keep. They caught a missing field in the journey
 planner's predecessor chain, three false interchange claims, a severity sort

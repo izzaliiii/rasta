@@ -72,6 +72,32 @@ const server = http.createServer((req, res) => {
       type = 'text/html; charset=utf-8';
     }
 
+    /* Time-shift support for demonstrating the staleness warning.
+     * ?now=YYYY-MM-DD makes the page believe the clock is at that date, so the
+     * "this data is out of date" banner can be seen without editing the real
+     * dataset. Development/demo only. */
+    const nowMatch = req.url.match(/[?&]now=(\d{4}-\d{2}-\d{2})/);
+    if (urlPath.endsWith('.html') && nowMatch) {
+      const inject = `<script>
+(function(){
+  var RealDate = Date;
+  var shifted = RealDate.parse('${nowMatch[1]}T12:00:00');
+  var realNow = RealDate.now();
+  function FakeDate(){
+    if (arguments.length === 0) return new RealDate(shifted);
+    return new (Function.prototype.bind.apply(RealDate, [null].concat([].slice.call(arguments))))();
+  }
+  FakeDate.now = function(){ return shifted; };
+  FakeDate.parse = RealDate.parse;
+  FakeDate.UTC = RealDate.UTC;
+  FakeDate.prototype = RealDate.prototype;
+  window.Date = FakeDate;
+  window.__RASTA_TIME_SHIFTED = '${nowMatch[1]}';
+})();
+</script>`;
+      body = Buffer.from(String(body).replace('</head>', inject + '</head>'), 'utf8');
+    }
+
     res.writeHead(200, {
       'Content-Type': type,
       'Cache-Control': 'no-cache',

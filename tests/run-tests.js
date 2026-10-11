@@ -437,6 +437,78 @@ check('activeAlerts is sorted worst-first for the home screen', () => {
   assert(rank[list[0].severity] === 0, `the most severe alert is not first (got ${list[0].severity})`);
 });
 
+/* --- 8. data freshness --------------------------------------------------
+ * The app ships a frozen snapshot and never updates itself. If it silently
+ * keeps serving month-old last-bus times, someone misses a bus. So the age of
+ * the data must be computed correctly and must escalate as it ages. */
+
+check('dataAgeDays is zero on the date the data was captured', () => {
+  const asOf = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  assert(Rasta.dataAgeDays(asOf) === 0, `expected 0, got ${Rasta.dataAgeDays(asOf)}`);
+});
+
+check('dataAgeDays counts forward correctly', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  const cases = [[1, 1], [30, 30], [200, 200], [365, 365]];
+  for (const [offset, expected] of cases) {
+    const d = new Date(base.getTime() + offset * 86400000);
+    const got = Rasta.dataAgeDays(d);
+    assert(got === expected, `+${offset} days gave ${got}, expected ${expected}`);
+  }
+});
+
+check('freshness reports "fresh" while the data is young', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  for (const offset of [0, 1, 44, 45]) {
+    const f = Rasta.freshness(new Date(base.getTime() + offset * 86400000));
+    assert(f.level === 'fresh', `+${offset} days was "${f.level}", expected fresh`);
+  }
+});
+
+check('freshness escalates to "ageing" then "stale" as time passes', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  const day = 86400000;
+  const ageing = Rasta.freshness(new Date(base.getTime() + 46 * day));
+  assert(ageing.level === 'ageing', `+46 days was "${ageing.level}", expected ageing`);
+
+  const edge = Rasta.freshness(new Date(base.getTime() + Rasta.staleAfterDays * day));
+  assert(edge.level === 'ageing', `at the threshold was "${edge.level}", expected ageing`);
+
+  const stale = Rasta.freshness(new Date(base.getTime() + (Rasta.staleAfterDays + 1) * day));
+  assert(stale.level === 'stale', `+${Rasta.staleAfterDays + 1} days was "${stale.level}", expected stale`);
+});
+
+check('a stale verdict actually says the data is unreliable', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  const f = Rasta.freshness(new Date(base.getTime() + 400 * 86400000));
+  assert(/out of date|unreliable/i.test(f.message),
+    `stale message does not warn the user: "${f.message}"`);
+});
+
+check('a future-dated dataset does not report as ancient', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  const f = Rasta.freshness(new Date(base.getTime() - 5 * 86400000));
+  assert(f.level === 'fresh', `future-dated data was "${f.level}"`);
+  assert(/system clock|future/i.test(f.message), 'future-dated data did not explain itself');
+});
+
+check('every freshness verdict carries a message for the UI', () => {
+  const base = new Date(Rasta.meta.dataAsOf + 'T12:00:00');
+  for (const offset of [0, 60, 400]) {
+    const f = Rasta.freshness(new Date(base.getTime() + offset * 86400000));
+    assert(typeof f.message === 'string' && f.message.length > 20,
+      `freshness at +${offset} days has no useful message`);
+    assert(f.days !== null, `freshness at +${offset} days lost the day count`);
+  }
+});
+
+check('the dataset reports as current today', () => {
+  // Guards against shipping a data date that is already old.
+  const f = Rasta.freshness();
+  assert(f.level === 'fresh',
+    `dataset is "${f.level}" (${f.days} days old) on release — refresh the data or update dataAsOf`);
+});
+
 /* --- report -------------------------------------------------------------- */
 
 console.log(`\n${passed} passed, ${failures.length} failed\n`);

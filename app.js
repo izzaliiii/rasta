@@ -48,6 +48,13 @@
     return s === 'high' ? 'Service disruption' : s === 'medium' ? 'Check before travel' : 'Note';
   }
 
+  function freshnessLabel(level) {
+    if (level === 'fresh') return 'Current';
+    if (level === 'ageing') return 'Ageing — verify before relying on it';
+    if (level === 'stale') return 'Out of date — do not rely on it';
+    return 'Unknown';
+  }
+
   function alertCard(a) {
     return '<div class="alert alert-' + esc(a.severity) + '">' +
       '<div class="alert-head">' +
@@ -83,6 +90,27 @@
     return '<span class="pill alert-pill alert-pill-' + esc(worst.severity) + '">' +
       (worst.severity === 'high' ? '⚠ disruption' : '⚠ ' + n + (n === 1 ? ' alert' : ' alerts')) +
       '</span>';
+  }
+
+  /**
+   * Freshness notice. Only rendered once the data is old enough to mislead —
+   * a permanent banner just trains people to ignore it. The whole point is
+   * that a stale transit app fails silently, so this has to shout when it is.
+   */
+  function freshnessNotice() {
+    var f = Rasta.freshness();
+    if (f.level === 'fresh' || f.level === 'unknown') return '';
+    var tone = f.level === 'stale' ? 'high' : 'medium';
+    var title = f.level === 'stale'
+      ? 'This data is out of date'
+      : 'Data may be out of date';
+    return '<div class="alert alert-' + tone + '">' +
+      '<div class="alert-head">' +
+        '<span class="alert-tag">' + esc(title) + '</span>' +
+        '<span class="alert-date">as of ' + esc(Rasta.meta.dataAsOf) + '</span>' +
+      '</div>' +
+      '<p class="alert-body" style="margin-bottom:0">' + esc(f.message) + '</p>' +
+    '</div>';
   }
 
   function stopsLabel(n) { return n + (n === 1 ? ' stop' : ' stops'); }
@@ -155,6 +183,7 @@
       }).join('');
 
       return '' +
+        freshnessNotice() +
         alertBanner(2) +
 
         '<div class="card">' +
@@ -698,6 +727,28 @@
           'It shows published routes, stop sequences and scheduled service windows. ' +
           'It cannot currently tell you where a bus is right now or when the next one will actually arrive. ' +
           'Where a live feed becomes available, this app can use it — until then, everything here is indicative.' +
+        '</div>' +
+
+        '<div class="card">' +
+          '<div class="card-title"><h2>How current is this?</h2></div>' +
+          '<p style="font-size:.9rem;color:var(--ink-2)">Rasta ships a <strong>frozen snapshot</strong> of the ' +
+          'network. It does not update itself: there is no feed to poll and no API to call, because no ' +
+          'machine-readable data is published for these services. Updates are made by hand, reviewed, and ' +
+          'released — which is slower than an automatic sync but means nothing reaches you unchecked.</p>' +
+          '<ul class="kv">' +
+            '<li><span class="k">Data as of</span><span class="v">' + esc(d.dataAsOf) + '</span></li>' +
+            '<li><span class="k">Age</span><span class="v">' +
+              (Rasta.dataAgeDays() === null ? 'unknown' : Rasta.dataAgeDays() + ' days') + '</span></li>' +
+            '<li><span class="k">Status</span><span class="v">' +
+              esc(freshnessLabel(Rasta.freshness().level)) + '</span></li>' +
+            '<li><span class="k">Considered stale after</span><span class="v">' +
+              Rasta.staleAfterDays + ' days</span></li>' +
+          '</ul>' +
+          '<div class="notice" style="margin-top:12px">' + esc(Rasta.freshness().message) + '</div>' +
+          '<p style="font-size:.86rem;color:var(--ink-2);margin:12px 0 0">' +
+            'This app will warn you on the home screen once the data passes that age, because a transit app ' +
+            'that quietly keeps serving stale times is more dangerous than one that admits it is out of date.' +
+          '</p>' +
         '</div>' +
 
         '<div class="card">' +

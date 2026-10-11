@@ -550,6 +550,68 @@ check('the theme toggle switches to dark and persists the choice', () => {
   assert(storage['rasta.theme'] === theme, 'theme choice was not persisted');
 });
 
+/* --- data freshness in the UI -------------------------------------------
+ * The logic is covered by run-tests.js. What matters here is that the warning
+ * genuinely reaches the screen: a stale app that computes staleness but never
+ * shows it has fixed nothing. Time is faked by swapping the sandbox Date. */
+
+const RealDate = sandbox.Date;
+
+/** Make the app think "now" is `daysAhead` days after the data date. */
+function pretendNow(daysAhead, fn) {
+  const base = new Date(sandbox.Rasta.meta.dataAsOf + 'T12:00:00').getTime();
+  const fakeNow = base + daysAhead * 86400000;
+  function FakeDate(...args) {
+    if (args.length === 0) return new RealDate(fakeNow);
+    return new RealDate(...args);
+  }
+  FakeDate.now = () => fakeNow;
+  FakeDate.parse = RealDate.parse;
+  FakeDate.UTC = RealDate.UTC;
+  FakeDate.prototype = RealDate.prototype;
+  sandbox.Date = FakeDate;
+  try { return fn(); } finally { sandbox.Date = RealDate; }
+}
+
+check('a current dataset shows no staleness warning on the home screen', () => {
+  const html = pretendNow(0, () => render('#/'));
+  assert(!/out of date/i.test(html),
+    'home screen warned about staleness while the data is current');
+  assert(html.includes('Service alerts'), 'home screen lost its alerts section');
+});
+
+check('an ageing dataset warns on the home screen', () => {
+  const html = pretendNow(60, () => render('#/'));
+  assert(html.includes('Data may be out of date'),
+    'no ageing warning on the home screen at 60 days');
+  assert(/last checked on/i.test(html), 'ageing warning gives no age context');
+});
+
+check('a stale dataset shouts on the home screen', () => {
+  const html = pretendNow(400, () => render('#/'));
+  assert(html.includes('This data is out of date'),
+    'no stale warning on the home screen at 400 days');
+  assert(/likely out of date/i.test(html), 'stale warning is too soft to act on');
+});
+
+check('the stale warning sits above the alerts, not buried below them', () => {
+  const html = pretendNow(400, () => render('#/'));
+  const staleAt = html.indexOf('This data is out of date');
+  const alertAt = html.indexOf('Service alerts');
+  assert(staleAt !== -1 && alertAt !== -1, 'expected both blocks to render');
+  assert(staleAt < alertAt, 'the staleness warning renders below the alerts');
+});
+
+check('the Info screen always reports the data age', () => {
+  const fresh = pretendNow(0, () => render('#/info'));
+  assert(fresh.includes('How current is this?'), 'no freshness card on the Info screen');
+  assert(fresh.includes('0 days'), 'Info screen does not show the data age');
+
+  const old = pretendNow(300, () => render('#/info'));
+  assert(old.includes('300 days'), 'Info screen did not update the age when stale');
+  assert(/Out of date/i.test(old), 'Info screen does not label stale data as out of date');
+});
+
 /* --- report ------------------------------------------------------------- */
 
 console.log(`\n${passed} passed, ${failures.length} failed\n`);
