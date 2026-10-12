@@ -69,6 +69,28 @@
   if (!window.RASTA_DATA) missing.push('data/transit-data.js');
   if (!window.Rasta) missing.push('data/rasta.js');
 
+  /* Self-heal. The service worker caches the app shell, so a shell that was
+   * cached while the deployment was broken will keep being served from cache
+   * long after the server is fixed. Rather than leaving the user stuck, drop
+   * every cache and unregister the worker, then offer one reload. */
+  var healed = false;
+  function recover() {
+    if (healed) return;
+    healed = true;
+    var jobs = [];
+    if (window.caches) {
+      jobs.push(caches.keys().then(function (keys) {
+        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      }));
+    }
+    if (navigator.serviceWorker) {
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function (regs) {
+        return Promise.all(regs.map(function (r) { return r.unregister(); }));
+      }));
+    }
+    return Promise.all(jobs);
+  }
+
   main.innerHTML =
     '<div class="card">' +
       '<h1>Rasta could not start</h1>' +
@@ -79,10 +101,21 @@
       '<p style="color:var(--ink-2)">The app needs its dataset before it can show routes, ' +
       'stops or journey plans. This usually means a deployment did not include the ' +
       '<code>data/</code> folder, or a file was renamed.</p>' +
-      '<p style="color:var(--ink-2);font-size:.88rem">If you are running this locally, check ' +
-      'that <code>data/transit-data.js</code> and <code>data/rasta.js</code> both exist next to ' +
-      '<code>index.html</code>. Open the browser console for the underlying error.</p>' +
+      '<p style="color:var(--ink-2);font-size:.88rem">If you have visited this page before, ' +
+      'your browser may be showing a cached copy of a broken version. ' +
+      '<button class="btn btn-sm" id="rastaRecover" type="button">Clear cached copy and reload</button>' +
+      '</p>' +
     '</div>';
+
+  var btn = document.getElementById('rastaRecover');
+  if (btn) {
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      btn.textContent = 'Clearing…';
+      recover().then(function () { location.reload(true); },
+                     function () { location.reload(true); });
+    });
+  }
 })();
 </script>
 </body>

@@ -5,7 +5,12 @@
  * regardless and simply skips this file.
  * ==========================================================================*/
 
-var CACHE = 'rasta-v1';
+/* Bump this whenever the app shell changes. `activate` deletes every cache
+ * whose name does not match, which is what evicts a bad build from clients that
+ * already installed it. v1 shipped with the dataset missing from the
+ * deployment, so every client that loaded it then was serving a broken shell
+ * from cache; v2 exists to clear that. */
+var CACHE = 'rasta-v2';
 
 var ASSETS = [
   './',
