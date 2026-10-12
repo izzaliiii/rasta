@@ -48,5 +48,42 @@
 <script src="data/transit-data.js"></script>
 <script src="data/rasta.js"></script>
 <script src="app.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+ * Load guard.
+ *
+ * If the dataset fails to load, the app cannot render anything and the page is
+ * simply blank. That is exactly what happened once: data/transit-data.js was
+ * missing from a deployment and the live site showed no buses and no routes,
+ * with the real reason buried in the browser console where nobody would look.
+ *
+ * An app that renders nothing looks "empty" rather than "broken". Say so.
+ * ------------------------------------------------------------------------- */
+(function () {
+  if (window.RASTA_DATA && window.Rasta) return;
+
+  var main = document.getElementById('main');
+  if (!main) return;
+
+  var missing = [];
+  if (!window.RASTA_DATA) missing.push('data/transit-data.js');
+  if (!window.Rasta) missing.push('data/rasta.js');
+
+  main.innerHTML =
+    '<div class="card">' +
+      '<h1>Rasta could not start</h1>' +
+      '<div class="notice notice-warn" style="margin-bottom:12px">' +
+        '<strong>Missing file' + (missing.length > 1 ? 's' : '') + ':</strong> ' +
+        missing.join(', ') +
+      '</div>' +
+      '<p style="color:var(--ink-2)">The app needs its dataset before it can show routes, ' +
+      'stops or journey plans. This usually means a deployment did not include the ' +
+      '<code>data/</code> folder, or a file was renamed.</p>' +
+      '<p style="color:var(--ink-2);font-size:.88rem">If you are running this locally, check ' +
+      'that <code>data/transit-data.js</code> and <code>data/rasta.js</code> both exist next to ' +
+      '<code>index.html</code>. Open the browser console for the underlying error.</p>' +
+    '</div>';
+})();
+</script>
 </body>
 </html>

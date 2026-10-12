@@ -509,6 +509,88 @@ check('the dataset reports as current today', () => {
     `dataset is "${f.level}" (${f.days} days old) on release — refresh the data or update dataAsOf`);
 });
 
+/* --- 9. deployment sanity ----------------------------------------------
+ * The app shipped once WITHOUT its dataset: a stray `t*.js` ignore rule matched
+ * data/transit-data.js, so the deployed site loaded the engine but not the data
+ * and rendered a blank page. Every existing test passed, because they all read
+ * the file straight from disk and never asked whether it would be deployed.
+ *
+ * The primary check below reads files directly, so it works even where spawning
+ * a subprocess is not permitted. A git-backed check runs too when git is
+ * reachable, and says so plainly when it is not rather than passing silently. */
+
+const fsMod = require('fs');
+
+/** Every file index.html actually pulls in at runtime. */
+function runtimeAssets() {
+  const html = fsMod.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const refs = [];
+  const re = /(?:src|href)\s*=\s*"([^"]+)"/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const ref = m[1];
+    if (/^(data:|https?:|#|mailto:)/.test(ref)) continue;
+    refs.push(ref);
+  }
+  return refs;
+}
+
+check('index.html references its dataset and every asset exists on disk', () => {
+  const refs = runtimeAssets();
+  assert(refs.includes('data/transit-data.js'),
+    'index.html does not reference data/transit-data.js');
+  assert(refs.includes('data/rasta.js'), 'index.html does not reference data/rasta.js');
+
+  const missing = refs.filter(r => !fsMod.existsSync(path.join(ROOT, r)));
+  assert(missing.length === 0,
+    `index.html references files that do not exist: ${missing.join(', ')}`);
+});
+
+check('every runtime asset is non-trivial, so an empty file cannot ship', () => {
+  const tooSmall = [];
+  for (const ref of runtimeAssets()) {
+    const p = path.join(ROOT, ref);
+    if (!fsMod.existsSync(p)) continue;
+    const size = fsMod.statSync(p).size;
+    if (size < 200) tooSmall.push(`${ref} (${size} bytes)`);
+  }
+  assert(tooSmall.length === 0, `suspiciously small assets: ${tooSmall.join(', ')}`);
+});
+
+check('the dataset is substantial, not a placeholder', () => {
+  const size = fsMod.statSync(path.join(ROOT, 'data/transit-data.js')).size;
+  assert(size > 5000, `data/transit-data.js is only ${size} bytes — is it the real dataset?`);
+});
+
+check('the app fails loudly when the dataset is absent', () => {
+  // The load guard in index.html is what turns a blank page into a message.
+  const html = fsMod.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  assert(/RASTA_DATA/.test(html) && /could not start/i.test(html),
+    'index.html has no load guard, so a missing dataset would render a blank page');
+});
+
+/* Bonus check: ask git directly whether these files would be deployed. Node
+ * cannot always spawn a subprocess (sandboxes commonly block piped stdio), so a
+ * spawn failure is reported rather than counted as either a pass or a failure. */
+(function gitDeploymentCheck() {
+  const { execFileSync } = require('child_process');
+  let tracked;
+  try {
+    tracked = execFileSync('git', ['ls-files', 'data/'],
+      { cwd: ROOT, encoding: 'utf8' }).split('\n').map(s => s.trim()).filter(Boolean);
+  } catch (err) {
+    console.log('  (note: could not run git to verify tracked files — ' +
+      (err.code || err.message.split('\n')[0]) + ')');
+    return;
+  }
+  check('git tracks the dataset (so it will be deployed)', () => {
+    assert(tracked.includes('data/transit-data.js'),
+      'data/transit-data.js is NOT tracked by git — look for a .gitignore pattern ' +
+      'matching it. This exact bug shipped once and produced a site with no buses.');
+    assert(tracked.includes('data/rasta.js'), 'data/rasta.js is not tracked by git');
+  });
+})();
+
 /* --- report -------------------------------------------------------------- */
 
 console.log(`\n${passed} passed, ${failures.length} failed\n`);
