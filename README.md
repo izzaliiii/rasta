@@ -39,6 +39,7 @@ routes, stops and journey planning work with no internet in both cases.
 |---|---|
 | **Home** | Data-age warning when stale, service alerts, then stop search and the line list |
 | **Lines** | All four lines with length, span, frequency and fare |
+| **Map** | Schematic route map with selectable lines, clickable stops and optional device location |
 | **Line detail** | Every stop in order, with interchanges marked and a reverse-direction toggle |
 | **Plan** | Pick two stops; get the lines to take, where to change, estimated time and fare |
 | **Stops** | Every stop by city, with search that also matches landmarks and areas |
@@ -93,8 +94,15 @@ arrival-prediction API exists for these services. This was checked properly:
   (Kentkart, behind the official CDA app) and are not published or licensed.
 
 So the app shows **published routes and scheduled service windows**, and says so
-on every screen that could mislead. If a live feed ever appears, the data layer
-is ready to consume it.
+on every screen that could mislead. A real-time feed would require an operator
+or licensed vendor integration before live arrivals or vehicle positions could
+be displayed.
+
+The Map screen draws routes and stops from the app's approximate coordinates and
+can show the rider's device location with permission. It does **not** show bus
+positions. Fare and service details display the dataset review date; these are
+still a snapshot and cannot be refreshed from the operator automatically. Do
+not treat the displayed fare as a live fare quote.
 
 ### Other honest limits
 

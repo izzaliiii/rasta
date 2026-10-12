@@ -206,7 +206,8 @@
         '<div class="card">' +
           '<div class="card-title"><h2>Plan a journey</h2></div>' +
           '<p style="color:var(--ink-2);font-size:.9rem">Pick where you are and where you are going — Rasta works out which lines to take, where to change, and roughly how long it takes.</p>' +
-          '<a class="btn btn-primary btn-block" href="#/plan" style="display:block;text-align:center;text-decoration:none">Open journey planner</a>' +
+          '<div class="row wrap"><a class="btn btn-primary" href="#/plan" style="flex:1;text-align:center;text-decoration:none">Plan a journey</a>' +
+          '<a class="btn" href="#/map" style="flex:1;text-align:center;text-decoration:none">Explore route map</a></div>' +
         '</div>' +
 
         '<div class="section-head"><h2>Network</h2><p>' + Rasta.lines.length + ' lines · ' + totalStops +
@@ -293,6 +294,81 @@
     }
   };
 
+  /* ================================================================ MAP */
+
+  var mapView = {
+    title: 'Route map — Rasta',
+    html: function (params, query) {
+      var selected = Rasta.lineById[query.line] || null;
+      var ids = selected ? selected.stations.slice() : Rasta.servedIds.slice();
+      var coords = ids.map(function (id) { return Rasta.stations[id].coord; });
+      var lats = coords.map(function (c) { return c[0]; });
+      var lons = coords.map(function (c) { return c[1]; });
+      var minLat = Math.min.apply(Math, lats), maxLat = Math.max.apply(Math, lats);
+      var minLon = Math.min.apply(Math, lons), maxLon = Math.max.apply(Math, lons);
+      function point(id) {
+        var c = Rasta.stations[id].coord;
+        return { x: 34 + (c[1] - minLon) / (maxLon - minLon || 1) * 632,
+          y: 30 + (maxLat - c[0]) / (maxLat - minLat || 1) * 450 };
+      }
+      var lines = (selected ? [selected] : Rasta.lines).map(function (line) {
+        var d = line.stations.map(function (id, i) {
+          var p = point(id); return (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+        }).join(' ');
+        return '<path class="map-line" d="' + d + '" stroke="' + esc(line.color) + '"/>';
+      }).join('');
+      var stops = ids.map(function (id, i) {
+        var s = Rasta.stations[id], p = point(id);
+        var anchor = i % 2 ? 'end' : 'start';
+        var dx = i % 2 ? -8 : 8;
+        return '<a class="map-stop" href="#/stop/' + esc(id) + '" aria-label="' + esc(s.name) + ', open stop details">' +
+          '<title>' + esc(s.name) + ' — ' + esc(s.city) + '</title>' +
+          '<g transform="translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')"><circle r="5"/><text x="' + dx + '" y="-7" text-anchor="' + anchor + '">' + esc(s.name) + '</text></g></a>';
+      }).join('');
+      var options = '<option value="">All bus lines</option>' + Rasta.lines.map(function (line) {
+        return '<option value="' + esc(line.id) + '"' + (selected && selected.id === line.id ? ' selected' : '') + '>' + esc(line.shortName) + '</option>';
+      }).join('');
+      return '<div class="section-head" style="margin-top:0"><h1>Bus route map</h1><p>Explore stops and routes across Islamabad and Rawalpindi.</p></div>' +
+        '<div class="card"><div class="map-controls"><label class="field" style="margin:0;flex:1"><span class="lbl">Show route</span><select id="mapLine">' + options + '</select></label>' +
+        '<button class="btn" id="mapLocate" type="button">Show my location</button></div></div>' +
+        '<div class="card network-map"><svg viewBox="0 0 700 510" role="img" aria-label="Schematic bus route map with selectable stops">' +
+        '<text x="24" y="495" fill="var(--muted)" font-size="12">Schematic route map · stop coordinates are approximate</text>' + lines + stops + '<circle id="mapUser" class="map-user" r="8" cx="-30" cy="-30"/></svg></div>' +
+        '<div class="card"><div class="card-title"><h2>Bus locations</h2><span class="pill pill-muted">No live feed</span></div>' +
+        '<p style="color:var(--ink-2);margin-bottom:0">The operators do not publish bus GPS positions to this app, so moving bus markers and arrival predictions are unavailable. The map shows published routes and stops only. <a href="#/info">Data and sources</a></p></div>' +
+        '<div id="mapStatus" class="notice" aria-live="polite" hidden></div>';
+    },
+    mount: function (params, query) {
+      var selector = document.getElementById('mapLine');
+      var locate = document.getElementById('mapLocate');
+      var status = document.getElementById('mapStatus');
+      var userPin = document.getElementById('mapUser');
+      selector.addEventListener('change', function () {
+        location.hash = '#/map' + (selector.value ? '?line=' + encodeURIComponent(selector.value) : '');
+      });
+      locate.addEventListener('click', function () {
+        if (!navigator.geolocation) { status.hidden = false; status.textContent = 'Location is not available in this browser.'; return; }
+        locate.disabled = true; locate.textContent = 'Finding you…';
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          var lat = pos.coords.latitude, lon = pos.coords.longitude;
+          var line = Rasta.lineById[query.line];
+          var ids = line ? line.stations : Rasta.servedIds;
+          var lats = ids.map(function (id) { return Rasta.stations[id].coord[0]; });
+          var lons = ids.map(function (id) { return Rasta.stations[id].coord[1]; });
+          var minLat = Math.min.apply(Math, lats), maxLat = Math.max.apply(Math, lats);
+          var minLon = Math.min.apply(Math, lons), maxLon = Math.max.apply(Math, lons);
+          var x = 34 + (lon - minLon) / (maxLon - minLon || 1) * 632;
+          var y = 30 + (maxLat - lat) / (maxLat - minLat || 1) * 450;
+          userPin.setAttribute('cx', x); userPin.setAttribute('cy', y);
+          status.hidden = false; status.textContent = 'Your location is shown in blue. Bus locations are not available.';
+          locate.disabled = false; locate.textContent = 'Update my location';
+        }, function () {
+          status.hidden = false; status.textContent = 'Could not get your location. Allow location access and try again.';
+          locate.disabled = false; locate.textContent = 'Try location again';
+        }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+      });
+    }
+  };
+
   /* =========================================================== ROUTE DETAIL */
 
   var routeView = {
@@ -363,6 +439,7 @@
               ' ' + (line.fare ? confBadge(line.fare.confidence) : '') + '</span></li>' +
           '</ul>' +
           '<div class="notice" style="margin-top:12px">' + esc(line.timings.note) + '</div>' +
+          '<p style="font-size:.82rem;color:var(--muted);margin:10px 0 0">Fare and service information last reviewed ' + esc(Rasta.meta.dataAsOf) + '. This is a saved snapshot, not live operator data; confirm fare at the station.</p>' +
         '</div>' +
 
         '<div class="section-head"><h2>' + stopsLabel(line.stations.length) + '</h2>' +
@@ -846,6 +923,7 @@
   var ROUTES = [
     { re: /^\/$/,                 tab: 'home',   view: homeView },
     { re: /^\/routes$/,           tab: 'routes', view: routesView },
+    { re: /^\/map$/,              tab: 'map',    view: mapView },
     { re: /^\/route\/(.+)$/,      tab: 'routes', view: routeView },
     { re: /^\/stops$/,            tab: 'stops',  view: stopsView },
     { re: /^\/stop\/(.+)$/,       tab: 'stops',  view: stopView },

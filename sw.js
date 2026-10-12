@@ -7,10 +7,9 @@
 
 /* Bump this whenever the app shell changes. `activate` deletes every cache
  * whose name does not match, which is what evicts a bad build from clients that
- * already installed it. v1 shipped with the dataset missing from the
- * deployment, so every client that loaded it then was serving a broken shell
- * from cache; v2 exists to clear that. */
-var CACHE = 'rasta-v2';
+ * already installed it. Increment this when the shell changes so clients
+ * refresh their cached copy. */
+var CACHE = 'rasta-v3';
 
 var ASSETS = [
   './',
