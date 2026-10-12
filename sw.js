@@ -9,7 +9,7 @@
  * whose name does not match, which is what evicts a bad build from clients that
  * already installed it. Increment this when the shell changes so clients
  * refresh their cached copy. */
-var CACHE = 'rasta-v3';
+var CACHE = 'rasta-v4';
 
 var ASSETS = [
   './',

@@ -799,6 +799,11 @@
       return '' +
         '<div class="section-head" style="margin-top:0"><h1>About Rasta</h1></div>' +
 
+        '<div class="card">' +
+          '<div class="card-title"><h2>About the creator</h2></div>' +
+          '<p style="color:var(--ink-2);margin-bottom:0">Created by <strong>Syed Abdullah</strong>. Rasta was created to make Islamabad and Rawalpindi bus routes, stops, fares, and journey planning easier to find in one place.</p>' +
+        '</div>' +
+
         '<div class="notice notice-warn" style="margin-bottom:14px">' +
           '<strong>Rasta is not a real-time bus tracker.</strong> ' +
           'It shows published routes, stop sequences and scheduled service windows. ' +
