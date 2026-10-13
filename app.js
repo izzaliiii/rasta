@@ -296,7 +296,7 @@
   /* ================================================================ MAP */
 
   var mapView = {
-    title: 'Route map — Rasta',
+    title: 'Route map | Rasta',
     html: function (params, query) {
       var selected = Rasta.lineById[query.line] || null;
       var ids = selected ? selected.stations.slice() : Rasta.servedIds.slice();
@@ -321,7 +321,7 @@
         var anchor = i % 2 ? 'end' : 'start';
         var dx = i % 2 ? -8 : 8;
         return '<a class="map-stop" href="#/stop/' + esc(id) + '" aria-label="' + esc(s.name) + ', open stop details">' +
-          '<title>' + esc(s.name) + ' — ' + esc(s.city) + '</title>' +
+          '<title>' + esc(s.name) + ' : ' + esc(s.city) + '</title>' +
           '<g transform="translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')"><circle r="5"/><text x="' + dx + '" y="-7" text-anchor="' + anchor + '">' + esc(s.name) + '</text></g></a>';
       }).join('');
       var options = '<option value="">All bus lines</option>' + Rasta.lines.map(function (line) {
@@ -331,7 +331,7 @@
         '<div class="card"><div class="map-controls"><label class="field" style="margin:0;flex:1"><span class="lbl">Show route</span><select id="mapLine">' + options + '</select></label>' +
         '<button class="btn" id="mapLocate" type="button">Show my location</button></div></div>' +
         '<div class="card network-map"><svg viewBox="0 0 700 510" role="img" aria-label="Schematic bus route map with selectable stops">' +
-        '<text x="24" y="495" fill="var(--muted)" font-size="12">Schematic route map · stop coordinates are approximate</text>' + lines + stops + '<circle id="mapUser" class="map-user" r="8" cx="-30" cy="-30"/></svg></div>' +
+        '<text x="24" y="495" fill="var(--muted)" font-size="12">Schematic route map, stop coordinates are approximate</text>' + lines + stops + '<circle id="mapUser" class="map-user" r="8" cx="-30" cy="-30"/></svg></div>' +
         '<div class="card"><div class="card-title"><h2>Bus locations</h2><span class="pill pill-muted">No live feed</span></div>' +
         '<p style="color:var(--ink-2);margin-bottom:0">The operators do not publish bus GPS positions to this app, so moving bus markers and arrival predictions are unavailable. The map shows published routes and stops only. <a href="#/info">Data and sources</a></p></div>' +
         '<div id="mapStatus" class="notice" aria-live="polite" hidden></div>';
@@ -346,7 +346,7 @@
       });
       locate.addEventListener('click', function () {
         if (!navigator.geolocation) { status.hidden = false; status.textContent = 'Location is not available in this browser.'; return; }
-        locate.disabled = true; locate.textContent = 'Finding you…';
+        locate.disabled = true; locate.textContent = 'Finding you...';
         navigator.geolocation.getCurrentPosition(function (pos) {
           var lat = pos.coords.latitude, lon = pos.coords.longitude;
           var line = Rasta.lineById[query.line];

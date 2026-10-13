@@ -285,6 +285,7 @@ const ROUTE_CASES = [
   ['#/stop/faizabad', 'stop detail', ['Faizabad', 'Lines serving this stop']],
   ['#/stop/pims', 'interchange stop detail', ['PIMS', 'Red Line', 'Blue Line', 'Green Line']],
   ['#/plan', 'journey planner form', ['Plan a journey', 'From', 'To', 'Find route']],
+  ['#/map', 'route map', ['Bus route map', 'network-map', 'No live feed']],
   ['#/alerts', 'alerts screen', ['Service alerts']],
   ['#/info', 'info screen', ['About Rasta', 'Known gaps', 'Reference sources']]
 ];
@@ -386,6 +387,61 @@ check('unknown routes render a not-found page rather than throwing', () => {
 check('an unknown line id renders not-found rather than throwing', () => {
   const html = render('#/route/does_not_exist');
   assert(html.includes('Not found'), 'unknown line did not render not-found');
+});
+
+/* --- route map ----------------------------------------------------------- */
+
+check('the map draws a path for every line and a marker for every stop', () => {
+  const html = render('#/map');
+  const Rasta = sandbox.Rasta;
+  const paths = (html.match(/class="map-line"/g) || []).length;
+  assert(paths === Rasta.lines.length,
+    `map drew ${paths} route paths, expected ${Rasta.lines.length}`);
+  const stops = (html.match(/class="map-stop"/g) || []).length;
+  assert(stops === Rasta.servedIds.length,
+    `map drew ${stops} stops, expected ${Rasta.servedIds.length}`);
+});
+
+check('the map can be filtered to a single line', () => {
+  const html = render('#/map?line=red');
+  const Rasta = sandbox.Rasta;
+  const paths = (html.match(/class="map-line"/g) || []).length;
+  assert(paths === 1, `filtered map drew ${paths} paths, expected 1`);
+  const stops = (html.match(/class="map-stop"/g) || []).length;
+  assert(stops === Rasta.lineById.red.stations.length,
+    `filtered map drew ${stops} stops, expected ${Rasta.lineById.red.stations.length}`);
+  assert(html.includes('selected'), 'the active line is not marked selected in the dropdown');
+});
+
+check('an unknown line filter falls back to the whole network', () => {
+  const html = render('#/map?line=not_a_line');
+  const paths = (html.match(/class="map-line"/g) || []).length;
+  assert(paths === sandbox.Rasta.lines.length, 'bad filter did not fall back to all lines');
+});
+
+check('the map states plainly that no live bus positions exist', () => {
+  const html = render('#/map');
+  assert(/No live feed/.test(html), 'map does not flag the absence of a live feed');
+  assert(/do not publish bus GPS/i.test(html), 'map does not explain why buses are not shown');
+  assert(!/class="map-bus"/.test(html), 'map renders a bus marker despite having no live data');
+});
+
+check('the map labels every stop with an accessible name', () => {
+  const html = render('#/map');
+  const labelled = (html.match(/aria-label="[^"]+, open stop details"/g) || []).length;
+  assert(labelled === sandbox.Rasta.servedIds.length,
+    `${labelled} of ${sandbox.Rasta.servedIds.length} stops have an accessible label`);
+});
+
+check('the locate button degrades gracefully with no geolocation support', () => {
+  render('#/map');
+  const btn = ui('mapLocate');
+  assert(btn, 'locate button did not render');
+  btn.click(); // the test environment has no navigator.geolocation
+  const status = ui('mapStatus');
+  assert(status.hidden === false, 'status stayed hidden after a failed locate');
+  assert(/not available/i.test(status.textContent || ''),
+    `unhelpful message when geolocation is missing: "${status.textContent}"`);
 });
 
 /* --- real interaction ----------------------------------------------------
