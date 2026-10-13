@@ -28,7 +28,7 @@ This MIT licence covers the application code in this repository.
 
 It does NOT override the terms of the upstream data described in README.md.
 In particular, the route topology and stop names in data/transit-data.js derive
-from the Wikimedia article "Rawalpindi–Islamabad Metrobus", which is licensed
+from the Wikimedia article "Rawalpindi-Islamabad Metrobus", which is licensed
 CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0/>. That portion
 remains under CC BY-SA 4.0 and any redistribution of it must credit the source
 and keep derivative databases under a compatible share-alike licence.

@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STEPS = [
   {
     file: '01-home.png',
-    title: '1. Home — it leads with the bad news',
+    title: '1. Home: it leads with the bad news',
     caption:
       'Service alerts come first, before anything else. The Red Line disruption reported on ' +
       '11 October 2026 sits at the top, tagged <em>unconfirmed</em> because we could only find ' +
@@ -27,29 +27,29 @@ const STEPS = [
   },
   {
     file: '02-planner.png',
-    title: '2. Journey planner — Saddar to the airport',
+    title: '2. Journey planner, Saddar to the airport',
     caption:
       'The headline numbers: <strong>2 hr 48 min</strong>, <strong>Rs 90</strong>, ' +
       '<strong>1 change</strong>, 44.8 km. Then step by step: Red Line for 13 stops to ' +
       'Faiz Ahmad Faiz, change there allowing about 8 minutes, then the Orange Line for 8 stops ' +
       'to the airport. Each leg can be expanded to show its intermediate stops. At the bottom, ' +
       '<strong>Alerts on this route</strong> pulls in only the disruptions affecting the lines ' +
-      'this particular journey uses — which is why the PIMS walking-transfer warning appears ' +
+      'this particular journey uses, which is why the PIMS walking-transfer warning appears ' +
       'on a Saddar-to-airport trip.'
   },
   {
     file: '03-route.png',
-    title: '3. Line detail — the full Red Line',
+    title: '3. Line detail, the full Red Line',
     caption:
       'All 24 stops in order down a route rail, with interchanges marked by a ring: ' +
       '<strong>Faiz Ahmad Faiz</strong> (change for the Orange Line) and <strong>PIMS</strong> ' +
       '(change for the Blue and Green Lines). The header gives 24 stops, 23.7 km, first bus ' +
-      '06:15, last bus 21:00 — the earlier time, not the 22:00 still published on other sites. ' +
+      '06:15, last bus 21:00, the earlier time, not the 22:00 still published on other sites. ' +
       'There is a reverse-direction toggle and an end-to-end planning shortcut.'
   },
   {
     file: '04-stops.png',
-    title: '4. Stops — every stop, grouped by city',
+    title: '4. Stops, every stop, grouped by city',
     caption:
       'All 57 stops grouped into Islamabad and Rawalpindi, each showing which lines serve it. ' +
       'The filter box searches names, areas <em>and</em> landmarks, so typing "expressway" ' +
@@ -57,7 +57,7 @@ const STEPS = [
   },
   {
     file: '05-alerts.png',
-    title: '5. Service alerts — all of them, worst first',
+    title: '5. Service alerts, all of them, worst first',
     caption:
       'Every disruption and every unresolved source conflict, sorted by severity. A ' +
       '<em>low</em>-confidence alert is required by the test suite to carry a source link, ' +
@@ -65,7 +65,7 @@ const STEPS = [
   },
   {
     file: '06-info.png',
-    title: '6. Info — what it cannot do',
+    title: '6. Info, what it cannot do',
     caption:
       'The honest page: what is covered, how confident each line is, and a "Known gaps" list ' +
       'stating outright that there is no live feed, that the Green Line stop list is disputed ' +
@@ -101,7 +101,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rasta — demo walkthrough</title>
+<title>Rasta: demo walkthrough</title>
 <style>
   :root {
     --brand: #0a7d4f; --bg: #f4f6f5; --card: #fff; --ink: #14201a;
@@ -151,7 +151,7 @@ const html = `<!DOCTYPE html>
 <body>
 <header>
   <div class="wrap">
-    <h1>Rasta — رستہ</h1>
+    <h1>Rasta</h1>
     <p>A walkthrough of the real app: Islamabad &amp; Rawalpindi Metro Bus and CDA bus routes.</p>
   </div>
 </header>
@@ -159,7 +159,7 @@ const html = `<!DOCTYPE html>
 <main>
   <div class="notice">
     <strong>These are real screenshots of the working app</strong>, captured from a running
-    build — not mockups. They were taken in headless Chrome at phone width. Chrome's
+    build, not mockups. They were taken in headless Chrome at phone width. Chrome's
     <code>--window-size</code> includes browser chrome, so the rendered page is a little wider
     than the captured image and some right-edge text is cropped in these pictures only; the
     layout itself measures <strong>0px horizontal overflow</strong> at 420&nbsp;px across all

@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — tiny static server for local testing and phone access.
+ * Rasta | tiny static server for local testing and phone access.
  *
  *   node serve.js            # http://localhost:8080
  *   node serve.js 3000       # custom port
@@ -56,7 +56,7 @@ const server = http.createServer((req, res) => {
      * Chrome's --screenshot only captures the viewport, which cuts off long
      * pages like a 24-stop route. Adding ?full=1 grows the viewport to the
      * page's true scroll height so one screenshot captures the whole thing.
-     * Test/demo only — it does not affect normal browsing. */
+     * Test/demo only : it does not affect normal browsing. */
     if (urlPath.endsWith('.html') && /[?&]full=1\b/.test(req.url)) {
       const inject = `<style>html,body{height:auto!important;overflow:visible!important}</style>
 <script>

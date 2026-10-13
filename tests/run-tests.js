@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — data integrity and routing tests
+ * Rasta | data integrity and routing tests
  *
  * Runs the REAL data and logic files in a browser-like sandbox, then checks
  * every structural invariant the UI depends on. No test framework, no deps.
@@ -506,7 +506,7 @@ check('the dataset reports as current today', () => {
   // Guards against shipping a data date that is already old.
   const f = Rasta.freshness();
   assert(f.level === 'fresh',
-    `dataset is "${f.level}" (${f.days} days old) on release — refresh the data or update dataAsOf`);
+    `dataset is "${f.level}" (${f.days} days old) on release : refresh the data or update dataAsOf`);
 });
 
 /* --- 9. deployment sanity ----------------------------------------------
@@ -559,7 +559,7 @@ check('every runtime asset is non-trivial, so an empty file cannot ship', () => 
 
 check('the dataset is substantial, not a placeholder', () => {
   const size = fsMod.statSync(path.join(ROOT, 'data/transit-data.js')).size;
-  assert(size > 5000, `data/transit-data.js is only ${size} bytes — is it the real dataset?`);
+  assert(size > 5000, `data/transit-data.js is only ${size} bytes : is it the real dataset?`);
 });
 
 check('the app fails loudly when the dataset is absent', () => {
@@ -579,13 +579,13 @@ check('the app fails loudly when the dataset is absent', () => {
     tracked = execFileSync('git', ['ls-files', 'data/'],
       { cwd: ROOT, encoding: 'utf8' }).split('\n').map(s => s.trim()).filter(Boolean);
   } catch (err) {
-    console.log('  (note: could not run git to verify tracked files — ' +
+    console.log('  (note: could not run git to verify tracked files : ' +
       (err.code || err.message.split('\n')[0]) + ')');
     return;
   }
   check('git tracks the dataset (so it will be deployed)', () => {
     assert(tracked.includes('data/transit-data.js'),
-      'data/transit-data.js is NOT tracked by git — look for a .gitignore pattern ' +
+      'data/transit-data.js is NOT tracked by git, look for a .gitignore pattern ' +
       'matching it. This exact bug shipped once and produced a site with no buses.');
     assert(tracked.includes('data/rasta.js'), 'data/rasta.js is not tracked by git');
   });

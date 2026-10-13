@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — Islamabad & Rawalpindi government bus network dataset
+ * Rasta | Islamabad & Rawalpindi government bus network dataset
  * ----------------------------------------------------------------------------
  * SHIPS AS PLAIN JAVASCRIPT ON PURPOSE.
  * A .js file assigning to window works when index.html is opened directly from
@@ -34,7 +34,7 @@
     saddar: {
       name: 'Saddar', nameUr: 'صدر', area: 'Saddar', city: 'Rawalpindi',
       coord: [33.5982, 73.0483], interchange: [],
-      landm: 'Saddar Bazaar and Raja Bazaar — Red Line western terminus',
+      landm: 'Saddar Bazaar and Raja Bazaar : Red Line western terminus',
       confidence: 'high'
     },
     marrir_chowk: {
@@ -80,7 +80,7 @@
     faizabad: {
       name: 'Faizabad', nameUr: 'فیض آباد', area: 'Faizabad', city: 'Islamabad',
       coord: [33.6396, 73.0817], interchange: [],
-      landm: 'Faizabad Interchange, on the Rawalpindi–Islamabad boundary',
+      landm: 'Faizabad Interchange, on the Rawalpindi-Islamabad boundary',
       confidence: 'high'
     },
     ijp_road: {
@@ -127,7 +127,7 @@
     pims: {
       name: 'PIMS', area: 'G-8 / PIMS', city: 'Islamabad',
       coord: [33.6930, 73.0480], interchange: ['blue', 'green'],
-      landm: 'Pakistan Institute of Medical Sciences — change point for the Blue and Green Lines',
+      landm: 'Pakistan Institute of Medical Sciences, change point for the Blue and Green Lines',
       confidence: 'high'
     },
     stock_exchange: {
@@ -153,7 +153,7 @@
     pak_secretariat: {
       name: 'Pak Secretariat', nameUr: 'پاک سیکرٹریٹ', area: 'Red Zone', city: 'Islamabad',
       coord: [33.7306, 73.0970], interchange: [],
-      landm: 'Pakistan Secretariat — Red Line eastern terminus',
+      landm: 'Pakistan Secretariat, Red Line eastern terminus',
       confidence: 'high'
     },
 
@@ -200,7 +200,7 @@
     airport: {
       name: 'Islamabad International Airport', area: 'Fateh Jang Road', city: 'Islamabad',
       coord: [33.5607, 72.8516], interchange: [],
-      landm: 'Islamabad International Airport — Orange Line western terminus',
+      landm: 'Islamabad International Airport : Orange Line western terminus',
       confidence: 'high'
     },
 
@@ -277,7 +277,7 @@
     gulberg: {
       name: 'Gulberg', area: 'Gulberg Greens', city: 'Islamabad',
       coord: [33.5600, 73.1550], interchange: [],
-      landm: 'Gulberg Greens — Blue Line southern terminus', confidence: 'medium'
+      landm: 'Gulberg Greens : Blue Line southern terminus', confidence: 'medium'
     },
 
     /* ==================== GREEN LINE: PIMS -> Barakahu ====================
@@ -317,7 +317,7 @@
     diplomatic_enclave: {
       name: 'Diplomatic Enclave', area: 'Diplomatic Enclave', city: 'Islamabad',
       coord: [33.7186, 73.1264], interchange: [],
-      landm: 'Diplomatic Enclave. Listed by only one source — verify locally',
+      landm: 'Diplomatic Enclave. Listed by only one source : verify locally',
       confidence: 'low'
     },
     malpur: {
@@ -328,7 +328,7 @@
     bari_imam_link: {
       name: 'Bari Imam Link Road', area: 'Bari Imam', city: 'Islamabad',
       coord: [33.7350, 73.1450], interchange: [],
-      landm: 'Bari Imam Link Road. Listed by only one source — verify locally',
+      landm: 'Bari Imam Link Road. Listed by only one source, verify locally',
       confidence: 'low'
     },
     shahdara: {
@@ -339,7 +339,7 @@
     barakahu: {
       name: 'Barakahu', nameUr: 'بھارہ کہو', area: 'Barakahu', city: 'Islamabad',
       coord: [33.7330, 73.1861], interchange: [],
-      landm: 'Bhara Kahu — Green Line eastern terminus', confidence: 'high'
+      landm: 'Bhara Kahu, Green Line eastern terminus', confidence: 'high'
     }
   };
 
@@ -492,7 +492,7 @@
         days: 'Daily',
         note: 'Crosses the city from PIMS out to Barakahu. Sources disagree on the exact ' +
               'stop list, so treat individual stops as indicative. This is NOT the airport ' +
-              'line — that is the Orange Line.'
+              'line : that is the Orange Line.'
       },
       fare: {
         type: 'flat',
@@ -506,7 +506,7 @@
   ];
 
   /* ------------------------------------------------------------------------
-   * SERVICE_ALERTS — disruptions and unresolved conflicts that affect travel
+   * SERVICE_ALERTS : disruptions and unresolved conflicts that affect travel
    * TODAY. These are shown prominently in the app. Nothing goes in here
    * without a date and a stated confidence, because an unverified alert that
    * makes someone miss a bus is worse than no alert at all.
@@ -559,7 +559,7 @@
       title: 'Changing lines at PIMS means a short walk, not a same-platform change',
       body: 'The Red Line calls at “PIMS”, while the Blue and Green Lines call at a separate ' +
             'nearby stop. Sources differ on how far apart they are, and we have no surveyed ' +
-            'walking distance. Allow extra time when changing lines here — it is the busiest ' +
+            'walking distance. Allow extra time when changing lines here : it is the busiest ' +
             'interchange in the network.',
       confidence: 'medium',
       source: null
@@ -611,7 +611,7 @@
       'No per-station arrival times or segment travel times are published, so journey times are modelled from distance, not measured.',
       'Changing lines at PIMS involves a walk between two separate stops. No surveyed walking distance exists.',
       'Stop names differ between signage, maps and what conductors say. This app uses the most widely recognised name.',
-      'Feeder routes, the CDA Electric Bus Service and the separate express airport service are not yet included — that is the biggest gap for journeys that do not start on a BRT corridor.',
+      'Feeder routes, the CDA Electric Bus Service and the separate express airport service are not yet included : that is the biggest gap for journeys that do not start on a BRT corridor.',
       'Stop coordinates are approximate points on the road corridor, not surveyed platform positions. They drive the time estimates, so treat every journey time as an estimate.'
     ]
   };

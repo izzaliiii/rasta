@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — service worker
+ * Rasta | service worker
  * Cache-first for the app shell, so routes and planning work with no network.
  * Only registers when served over http(s); opening index.html from disk works
  * regardless and simply skips this file.

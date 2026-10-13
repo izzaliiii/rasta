@@ -1,4 +1,4 @@
-# Rasta — رستہ
+# Rasta | رستہ
 
 Route, stop, timing and fare information for the government-run bus services of
 **Islamabad and Rawalpindi**: the Metro Bus Red Line and the CDA Orange, Blue and
@@ -13,7 +13,7 @@ Zero build step. No framework. No dependencies. No server required.
 Double-click **`index.html`**. That is the whole install.
 
 It works straight off the disk because the dataset ships as plain JavaScript
-(`data/transit-data.js`) rather than JSON — `fetch()` on a local file is blocked
+(`data/transit-data.js`) rather than JSON : `fetch()` on a local file is blocked
 by the browser, and this avoids that entirely. There is nothing to compile and
 nothing to `npm install`.
 
@@ -21,14 +21,14 @@ nothing to `npm install`.
 
 Serve the folder over HTTP and open it in a mobile browser, then *Add to Home
 screen*. It installs as an app, and a service worker caches the shell so it
-reloads with no connection at all — useful when you are out of data.
+reloads with no connection at all, useful when you are out of data.
 
 ```sh
 node serve.js          # prints a localhost URL and your phone-accessible LAN URL
 ```
 
 The service worker only registers over `http(s)`. Opening `index.html` directly
-skips it — which is fine, because the dataset is a local file either way, so
+skips it, which is fine, because the dataset is a local file either way, so
 routes, stops and journey planning work with no internet in both cases.
 
 ---
@@ -48,7 +48,7 @@ routes, stops and journey planning work with no internet in both cases.
 Journey planning is a shortest-path search across the stop graph. It scores a
 route by travel time plus an 8-minute penalty every time you change lines, so it
 prefers a slower direct bus over a fast connection if the change is not worth it.
-Fares are charged **per leg** — changing lines means paying again.
+Fares are charged **per leg**, changing lines means paying again.
 
 Dark mode follows your system setting and can be overridden with the ◐ button.
 Every screen has its own URL (`#/plan?from=saddar&to=airport`), so journeys are
@@ -67,7 +67,7 @@ app is built to be loud about it rather than quietly wrong: once the dataset
 passes **120 days** old, the home screen shows an "out of date" warning above
 everything else, and the Info screen always states the data's age.
 
-A stale transit app fails silently — it keeps showing a last-bus time that no
+A stale transit app fails silently : it keeps showing a last-bus time that no
 longer runs. That is worse than showing nothing, so the age of the data is
 computed and surfaced at all times.
 
@@ -88,7 +88,7 @@ arrival-prediction API exists for these services. This was checked properly:
 - `data.gov.pk` is a dead 404.
 - The Mobility Database has **no Pakistani feed at all**.
 - GitHub search for `gtfs pakistan` returns **zero results**.
-- Moovit covers Lahore and Karachi but not the twin cities — consistent with no
+- Moovit covers Lahore and Karachi but not the twin cities : consistent with no
   feed existing, since Moovit ingests published feeds.
 - Live positions do exist, but they sit inside a proprietary vendor backend
   (Kentkart, behind the official CDA app) and are not published or licensed.
@@ -129,10 +129,10 @@ the Info screen lists all known gaps. Nothing is silently guessed.
 
 | Source | Used for |
 |---|---|
-| [Rawalpindi–Islamabad Metrobus (Wikipedia)](https://en.wikipedia.org/wiki/Rawalpindi%E2%80%93Islamabad_Metrobus) and its [route diagram](https://en.wikipedia.org/wiki/Template:Rawalpindi-Islamabad_Metrobus) | Line membership and stop order |
-| [Punjab Mass Transit Authority](https://pma.punjab.gov.pk/) — operating hours and fare policy | Operating window, fare |
+| [Rawalpindi-Islamabad Metrobus (Wikipedia)](https://en.wikipedia.org/wiki/Rawalpindi%E2%80%93Islamabad_Metrobus) and its [route diagram](https://en.wikipedia.org/wiki/Template:Rawalpindi-Islamabad_Metrobus) | Line membership and stop order |
+| [Punjab Mass Transit Authority](https://pma.punjab.gov.pk/), operating hours and fare policy | Operating window, fare |
 | [Punjab Transport Department](https://transport.punjab.gov.pk/metro_bus_services) | Operator and route confirmation |
-| [Safar](https://www.safar.fyi/islamabad) | Cross-checking route counts and fares *(reference only — all rights reserved, not ingested)* |
+| [Safar](https://www.safar.fyi/islamabad) | Cross-checking route counts and fares *(reference only, all rights reserved, not ingested)* |
 | [Daily Ausaf](https://dailyausaf.com/en/pakistan/metro-bus-service-suspended-at-9-pm/) | Service reduction reporting |
 | [OpenStreetMap](https://www.openstreetmap.org/) | Reference for the corridor geography |
 
@@ -140,7 +140,7 @@ Some of this data was **verified against sources but the coordinates are ours**:
 hand-placed points on the road corridor, not surveyed platform positions and not
 imported from OSM. So no ODbL obligation attaches to this dataset. If you later
 import OSM geometry, you must credit "© OpenStreetMap contributors" and release
-the derived database under ODbL — it is share-alike.
+the derived database under ODbL, it is share-alike.
 
 Rasta is an independent community project. It is not affiliated with CDA, the
 Capital Mass Transit Authority or the Punjab Mass Transit Authority.
@@ -158,15 +158,17 @@ rasta/
 ├── manifest.webmanifest       install-to-home-screen
 ├── serve.js                   dependency-free static server for testing
 ├── data/
-│   ├── transit-data.js        THE DATASET — edit this to fix data
+│   ├── transit-data.js        THE DATASET, edit this to fix data
 │   └── rasta.js               indexes, search, fare maths, journey planner
 ├── demo/
 │   ├── index.html             self-contained screenshot walkthrough
 │   ├── build-demo.js          regenerates demo/index.html from the screenshots
 │   └── shots/                 the captured screens
+├── tools/
+│   └── dedash.js              strips stray dashes and decorative glyphs
 └── tests/
     ├── all.js                 run everything
-    ├── run-tests.js           data integrity, planner, freshness (46 checks)
+    ├── run-tests.js           data integrity, planner, freshness (50 checks)
     ├── calibrate.js           are the coordinates geographically sane?
     └── render-test.js         every view renders + controls work (44 checks)
 ```
@@ -175,12 +177,12 @@ rasta/
 
 ## Licence
 
-**Code** (everything except `data/` and `demo/shots/`) is MIT — see `LICENSE`.
+**Code** (everything except `data/` and `demo/shots/`) is MIT : see `LICENSE`.
 
 **Dataset** (`data/transit-data.js`) is a compilation of facts about a public
 transport network. Route topology and stop names were sourced from the Wikimedia
-article *Rawalpindi–Islamabad Metrobus*, which is licensed **CC BY-SA 4.0**, so
-that portion carries the same share-alike terms — credit it and keep any
+article *Rawalpindi-Islamabad Metrobus*, which is licensed **CC BY-SA 4.0**, so
+that portion carries the same share-alike terms : credit it and keep any
 derivative under a compatible licence. Coordinates are original work and
 approximate.
 
@@ -197,7 +199,7 @@ node tests/all.js
 
 Three suites, all dependency-free:
 
-**`run-tests.js`** — 46 checks over the dataset and planner. Structural integrity
+**`run-tests.js`** : 46 checks over the dataset and planner. Structural integrity
 (no duplicate ids, no orphan stations, no two stops sharing a coordinate),
 network connectivity (every stop reachable from every other), planner correctness
 (legs are contiguous runs on real lines, adjacent legs never repeat a line,
@@ -206,12 +208,12 @@ input), the alert channel, and data freshness (the age calculation must escalate
 from fresh to ageing to stale at the right thresholds, because a snapshot that
 never admits its age is dangerous).
 
-**`calibrate.js`** — measures each line the way the app does and compares it to
+**`calibrate.js`** : measures each line the way the app does and compares it to
 the operator's published corridor length. The Red Line is published at ~22.5 km
 and measures ~23.6 km. It also flags any single hop over 12 km and any implied
-speed outside a believable 8–45 km/h band.
+speed outside a believable 8-45 km/h band.
 
-**`render-test.js`** — 44 checks. Loads the real `app.js` against a minimal DOM
+**`render-test.js`** : 44 checks. Loads the real `app.js` against a minimal DOM
 and renders every route, then drives the controls: types two stops and submits,
 swaps endpoints, filters the stop list, toggles the theme. It also fakes the
 system clock to prove the staleness warning actually reaches the screen at 60
@@ -235,7 +237,7 @@ throughout and structured so that:
   reverse direction is the same list walked backwards; never duplicate it.
 - `SERVICE_ALERTS` holds disruptions and unresolved source conflicts, each with
   a date, a severity and a confidence. A `low`-confidence alert **must** carry a
-  source URL — a test enforces that, because an unverifiable alert that makes
+  source URL, a test enforces that, because an unverifiable alert that makes
   someone miss a bus is worse than no alert.
 
 Two tests will fight you if you get this wrong, which is the point: interchange

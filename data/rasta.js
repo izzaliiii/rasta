@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — data layer
+ * Rasta | data layer
  * Loads window.RASTA_DATA, indexes it, and exposes query + journey planning.
  * No framework, no dependencies. Everything here is pure/synchronous.
  * ==========================================================================*/
@@ -306,7 +306,7 @@ var Rasta = (function () {
    *
    * This app ships a FROZEN snapshot. Nothing here updates itself: there is no
    * feed to poll and no API to call. That is a deliberate consequence of no
-   * machine-readable data existing for these services — but it means the app
+   * machine-readable data existing for these services : but it means the app
    * will keep answering confidently long after the answer stops being true.
    *
    * A stale transit app fails silently and dangerously: it will show a last-bus

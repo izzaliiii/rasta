@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — calibration check
+ * Rasta | calibration check
  *
  * The journey planner derives every time estimate from inter-stop distance, so
  * if the coordinates are wrong the timings are wrong. This script measures each
@@ -10,7 +10,7 @@
  *
  * Station coordinates are hand-placed points on the road, not survey data, so
  * the measured length will never match the published figure exactly. Passing
- * here means the geometry is geographically sane — not that it is accurate to
+ * here means the geometry is geographically sane : not that it is accurate to
  * the metre.
  * ==========================================================================*/
 
@@ -60,7 +60,7 @@ for (const line of Rasta.lines) {
   const appKm = Rasta.totalLineKm(line);    // what the app actually uses
   const published = line.publishedLengthKm;
 
-  let verdict = 'no published reference — measurement recorded only';
+  let verdict = 'no published reference : measurement recorded only';
   let status = 'INFO';
 
   if (published) {
@@ -109,8 +109,8 @@ for (const line of Rasta.lines) {
   }
   const kmph = km / (p.totalMinutes / 60);
   let note = 'plausible';
-  if (kmph < MIN_KMPH) { note = 'TOO SLOW — coordinates likely stretched'; bad++; }
-  if (kmph > MAX_KMPH) { note = 'TOO FAST — coordinates likely compressed'; bad++; }
+  if (kmph < MIN_KMPH) { note = 'TOO SLOW, coordinates likely stretched'; bad++; }
+  if (kmph > MAX_KMPH) { note = 'TOO FAST, coordinates likely compressed'; bad++; }
   console.log(`  ${line.shortName.padEnd(12)} ${String(p.totalMinutes).padStart(4)} min  ` +
     `${km.toFixed(1).padStart(5)} km  ${kmph.toFixed(1).padStart(5)} km/h   ${note}`);
 }
@@ -121,7 +121,7 @@ console.log('\n4. Every line-to-line change the app can offer');
 console.log('-'.repeat(70));
 const multi = Rasta.servedIds.filter(id => Rasta.linesAtStation(id).length > 1);
 if (!multi.length) {
-  console.log('  no shared stations found — the network would be unconnected');
+  console.log('  no shared stations found, the network would be unconnected');
   bad++;
 } else {
   for (const id of multi) {

@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — run every check.
+ * Rasta | run every check.
  *
  *   node tests/all.js
  *
@@ -24,7 +24,7 @@ const SUITES = [
 let failed = 0;
 
 console.log('\n' + '#'.repeat(66));
-console.log('#  Rasta — full check suite');
+console.log('#  Rasta | full check suite');
 console.log('#'.repeat(66));
 
 for (const [label, script] of SUITES) {

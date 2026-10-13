@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — stylesheet
+ * Rasta | stylesheet
  * Mobile-first. No preprocessor, no framework, no external fonts.
  * ==========================================================================*/
 
@@ -168,7 +168,7 @@ html[data-theme="dark"] .icon-btn:hover { background: rgba(0, 0, 0, .3); }
   text-decoration: none; color: var(--muted);
   font-size: .68rem; font-weight: 600; letter-spacing: .01em;
 }
-.tabbar a .tab-ico { font-size: 1.15rem; line-height: 1; }
+.tabbar a .tab-ico { width: 20px; height: 20px; display: block; }
 .tabbar a[aria-current="page"] { color: var(--brand); }
 .tabbar a[aria-current="page"] .tab-ico { transform: translateY(-1px); }
 .tabbar a:focus-visible { outline: 2px solid var(--brand); outline-offset: -3px; }

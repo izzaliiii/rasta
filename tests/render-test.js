@@ -1,5 +1,5 @@
 /* ============================================================================
- * Rasta — render smoke test
+ * Rasta | render smoke test
  *
  * The data and planner are covered by run-tests.js, but none of that would
  * catch a broken HTML template, a typo in a view, or a mount function that
